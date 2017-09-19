@@ -622,32 +622,50 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
                 continue;
             }
             if (GLOBAL_ACTION_KEY_POWER.equals(actionKey)) {
-                addIfShouldShowAction(tempActions, shutdownAction);
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_POWER, 1) == 1) {
+                    addIfShouldShowAction(tempActions, shutdownAction);
+                }
             } else if (GLOBAL_ACTION_KEY_RESTART.equals(actionKey)) {
-                        addIfShouldShowAction(tempActions, restartAction);
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_RESTART, 1) == 1) {
+                    addIfShouldShowAction(tempActions, restartAction);
+                }
             } else if (GLOBAL_ACTION_KEY_RESTART_RECOVERY.equals(actionKey)) {
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_RESTART_RECOVERY, 1) == 1) {
                     mPowerItems.add(new RestartRecoveryAction());
                     mPowerItems.add(new RestartBootloaderAction());
                     mPowerItems.add(new RestartSystemUIAction());
                     addIfShouldShowAction(tempActions, new PowerOptionsAction());
+                }
             } else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
-                addIfShouldShowAction(tempActions, mAirplaneModeOn);
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_AIRPLANE, 0) == 1) {
+                    addIfShouldShowAction(tempActions, mAirplaneModeOn);
+                }
             } else if (GLOBAL_ACTION_KEY_BUGREPORT.equals(actionKey)) {
                 if (shouldDisplayBugReport(currentUser.get())) {
                     addIfShouldShowAction(tempActions, new BugReportAction());
                 }
             } else if (GLOBAL_ACTION_KEY_SILENT.equals(actionKey)) {
-                if (mShowSilentToggle) {
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_SOUNDPANEL, 0) == 1) {
                     addIfShouldShowAction(tempActions, mSilentModeAction);
                 }
             } else if (GLOBAL_ACTION_KEY_USERS.equals(actionKey)) {
-                if (SystemProperties.getBoolean("fw.power_user_switcher", false)) {
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_USERS, 0) == 1) {
                     addUserActions(tempActions, currentUser.get());
                 }
             } else if (GLOBAL_ACTION_KEY_SETTINGS.equals(actionKey)) {
-                addIfShouldShowAction(tempActions, getSettingsAction());
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_SETTINGS, 0) != 0) {
+                    addIfShouldShowAction(tempActions, getSettingsAction());
+                }
             } else if (GLOBAL_ACTION_KEY_LOCKDOWN.equals(actionKey)) {
-                if (shouldDisplayLockdown(currentUser.get())) {
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_LOCKDOWN, 0) != 0) {
                     addIfShouldShowAction(tempActions, new LockDownAction());
                 }
             } else if (GLOBAL_ACTION_KEY_VOICEASSIST.equals(actionKey)) {
@@ -655,9 +673,13 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             } else if (GLOBAL_ACTION_KEY_ASSIST.equals(actionKey)) {
                 addIfShouldShowAction(tempActions, getAssistAction());
             } else if (GLOBAL_ACTION_KEY_SCREENSHOT.equals(actionKey)) {
-                addIfShouldShowAction(tempActions, new ScreenshotAction());
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_SCREENSHOT, 0) == 1) {
+                    addIfShouldShowAction(tempActions, new ScreenshotAction());
+                }
             } else if (GLOBAL_ACTION_KEY_LOGOUT.equals(actionKey)) {
-                if (mDevicePolicyManager.isLogoutEnabled()
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_LOGOUT, 0) == 1
                         && currentUser.get() != null
                         && currentUser.get().id != UserHandle.USER_SYSTEM) {
                     addIfShouldShowAction(tempActions, new LogoutAction());
@@ -665,7 +687,7 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             } else if (GLOBAL_ACTION_KEY_EMERGENCY.equals(actionKey)) {
                 if (mContext.getResources().getBoolean(
                     com.android.internal.R.bool.config_showEmergencyButtonInPowerMenu)) {
-                        addIfShouldShowAction(tempActions, new EmergencyDialerAction());
+                    addIfShouldShowAction(tempActions, new EmergencyDialerAction());
                 }
             } else {
                 Log.e(TAG, "Invalid global action key " + actionKey);
@@ -1196,7 +1218,7 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     }
 
     private Action getSettingsAction() {
-        return new SinglePressAction(R.drawable.ic_settings,
+        return new SinglePressAction(com.android.systemui.R.drawable.ic_lock_settings,
                 R.string.global_action_settings) {
 
             @Override
@@ -1265,7 +1287,7 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     @VisibleForTesting
     class LockDownAction extends SinglePressAction {
         LockDownAction() {
-            super(R.drawable.ic_lock_lockdown, R.string.global_action_lockdown);
+            super(com.android.systemui.R.drawable.ic_lock_lock, R.string.global_action_lockdown);
         }
 
         @Override
