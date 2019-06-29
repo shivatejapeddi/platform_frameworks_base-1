@@ -68,10 +68,12 @@ public class NotificationInterruptStateProviderImpl implements NotificationInter
     private final ContentObserver mHeadsUpObserver;
     private HeadsUpManager mHeadsUpManager;
 
+
     @VisibleForTesting
     protected boolean mUseHeadsUp = false;
 
     private boolean mLessBoringHeadsUp;
+    private boolean mSkipHeadsUp;    
 
     @Inject
     public NotificationInterruptStateProviderImpl(
@@ -257,6 +259,7 @@ public class NotificationInterruptStateProviderImpl implements NotificationInter
         return true;
     }
 
+
     /**
      * Whether or not the notification should "pulse" on the user's display when the phone is
      * dozing.  This displays the ambient view of the notification.
@@ -352,14 +355,19 @@ public class NotificationInterruptStateProviderImpl implements NotificationInter
     public void setUseLessBoringHeadsUp(boolean lessBoring) {
         mLessBoringHeadsUp = lessBoring;
     }
-
+    
+    @Override
+    public void setGamingPeekMode(boolean skipHeadsUp) {
+        mSkipHeadsUp = skipHeadsUp;
+    }
+    
     public boolean shouldSkipHeadsUp(StatusBarNotification sbn) {
         boolean isImportantHeadsUp = false;
         String notificationPackageName = sbn.getPackageName().toLowerCase();
         isImportantHeadsUp = notificationPackageName.contains("dialer") ||
                 notificationPackageName.contains("messaging") ||
                 notificationPackageName.contains("clock");
-        return !mStatusBarStateController.isDozing() && mLessBoringHeadsUp && !isImportantHeadsUp;
+        return !mStatusBarStateController.isDozing() && mLessBoringHeadsUp && !isImportantHeadsUp && mSkipHeadsUp;
     }
 
     /**
