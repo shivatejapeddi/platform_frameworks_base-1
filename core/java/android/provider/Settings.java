@@ -5413,7 +5413,7 @@ public final class Settings {
          */
         public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
                 "theming_settings_dashboard_icons";
-
+                
         /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
@@ -5425,6 +5425,12 @@ public final class Settings {
          */
         public static final String[] LEGACY_RESTORE_SETTINGS = {
         };
+
+
+        /**
+         * @hide
+         */
+        public static final String USE_OLD_MOBILETYPE = "use_old_mobiletype";        
 
         /**
          * These are all public system settings
