@@ -49,7 +49,8 @@ import com.android.systemui.statusbar.SysuiStatusBarStateController;
 import com.android.systemui.statusbar.VibratorHelper;
 import com.android.systemui.statusbar.phone.LockscreenGestureLogger.LockscreenUiEvent;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
-
+import android.util.BoostFramework;
+import android.os.SystemProperties;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -116,6 +117,11 @@ public abstract class PanelViewController {
     private final DozeLog mDozeLog;
     private final VibratorHelper mVibratorHelper;
 
+    /**
+     * For PanelView fling perflock call
+     */
+    private BoostFramework mPerf = null;
+    private static boolean USE_SCROLL_BOOST = SystemProperties.getBoolean("persist.vendor.perf.gestureflingboost.enable", true);
     /**
      * Whether an instant expand request is currently pending and we are just waiting for layout.
      */
@@ -261,6 +267,8 @@ public abstract class PanelViewController {
         mVibratorHelper = vibratorHelper;
         mVibrateOnOpening = mResources.getBoolean(R.bool.config_vibrateOnIconAnimation);
         mStatusBarTouchableRegionManager = statusBarTouchableRegionManager;
+
+        mPerf = new BoostFramework();
     }
 
     protected void loadDimens() {
@@ -594,16 +602,26 @@ public abstract class PanelViewController {
                 animator.setDuration(mFixedDuration);
             }
         }
+        if (mPerf != null && USE_SCROLL_BOOST) {
+            String currentPackage = mView.getContext().getPackageName();
+            mPerf.perfHint(BoostFramework.VENDOR_HINT_SCROLL_BOOST, currentPackage, -1, BoostFramework.Scroll.PANEL_VIEW);
+        }
         animator.addListener(new AnimatorListenerAdapter() {
             private boolean mCancelled;
 
             @Override
             public void onAnimationCancel(Animator animation) {
+                if (mPerf != null) {
+                    mPerf.perfLockRelease();
+                }
                 mCancelled = true;
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                if (mPerf != null) {
+                    mPerf.perfLockRelease();
+                }
                 if (clearAllExpandHack && !mCancelled) {
                     setExpandedHeightInternal(getMaxPanelHeight());
                 }

@@ -124,6 +124,7 @@ import android.util.MathUtils;
 import android.util.Slog;
 import android.util.SparseIntArray;
 import android.util.apk.ApkSignatureVerifier;
+import android.util.BoostFramework;
 
 import com.android.internal.R;
 import com.android.internal.annotations.GuardedBy;
@@ -247,6 +248,14 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
     private final PackageSessionProvider mSessionProvider;
     private final StagingManager mStagingManager;
 
+    /*
+    * @hide
+    */
+    private BoostFramework mPerfBoostInstall = null;
+    private boolean mIsPerfLockAcquired = false;
+    private final int MAX_INSTALL_DURATION = 20000;
+    private  static boolean INSTALL_BOOST = SystemProperties.getBoolean("persist.vendor.perf.install.boost", true);
+    
     final int sessionId;
     final int userId;
     final SessionParams params;
@@ -930,6 +939,14 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
     public ParcelFileDescriptor openWrite(String name, long offsetBytes, long lengthBytes) {
         assertCanWrite(false);
         try {
+            if (mPerfBoostInstall == null){
+                mPerfBoostInstall = new BoostFramework();
+            }
+            if (mPerfBoostInstall != null && !mIsPerfLockAcquired && INSTALL_BOOST) {
+                mPerfBoostInstall.perfHint(BoostFramework.VENDOR_HINT_PACKAGE_INSTALL_BOOST,
+                        null, MAX_INSTALL_DURATION, -1);
+                mIsPerfLockAcquired = true;
+            }
             return doWriteInternal(name, offsetBytes, lengthBytes, null);
         } catch (IOException e) {
             throw ExceptionUtils.wrap(e);
@@ -1135,6 +1152,10 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
 
     @Override
     public void commit(@NonNull IntentSender statusReceiver, boolean forTransfer) {
+        if (mIsPerfLockAcquired && mPerfBoostInstall != null) {
+            mPerfBoostInstall.perfLockRelease();
+            mIsPerfLockAcquired = false;
+        }
         if (hasParentSessionId()) {
             throw new IllegalStateException(
                     "Session " + sessionId + " is a child of multi-package session "
@@ -2630,6 +2651,10 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
 
     @Override
     public void abandon() {
+        if (mIsPerfLockAcquired && mPerfBoostInstall != null) {
+            mPerfBoostInstall.perfLockRelease();
+            mIsPerfLockAcquired = false;
+        }
         if (hasParentSessionId()) {
             throw new IllegalStateException(
                     "Session " + sessionId + " is a child of multi-package session "

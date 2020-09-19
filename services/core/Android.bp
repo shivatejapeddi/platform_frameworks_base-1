@@ -134,6 +134,8 @@ java_library_static {
         "vendor.lineage.biometrics.fingerprint.inscreen-V1.0-java",
         "faceunlock_framework",
         "vendor.aosp.smartcharge-V1.0-java",
+        "vendor.qti.hardware.servicetracker-V1.0-java",
+        "vendor.qti.hardware.servicetracker-V1.2-java",
     ],
 }
 

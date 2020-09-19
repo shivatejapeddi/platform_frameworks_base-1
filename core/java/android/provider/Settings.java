@@ -5672,6 +5672,19 @@ public final class Settings {
          * @hide
          */
         public static final String GAMING_MODE_MANUAL_BRIGHTNESS_TOGGLE = "gaming_mode_manual_brightness_toggle";
+        
+        /**
+         * Whether to lock brightness in gaming mode
+         * @hide
+         */
+        public static final String GAMING_MODE_PERFORMANCE_TOGGLE = "gaming_mode_performance_toggle";
+
+        /**
+         * Whether to lock brightness in gaming mode
+         * @hide
+         */
+        public static final String GAMING_MODE_FPS_TOGGLE = "gaming_mode_fps_toggle";  
+                
 
         /**
          * Whether to automatically enable the gaming mode
