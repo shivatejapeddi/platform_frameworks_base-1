@@ -93,4 +93,3 @@ int register_android_server_ActivityTriggerService(JNIEnv *env) {
           method_list, NELEM(method_list));
 }
 };
-

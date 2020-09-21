@@ -68,6 +68,7 @@ import com.android.internal.os.ProcessCpuTracker;
 import com.android.internal.os.Zygote;
 import com.android.internal.util.FrameworkStatsLog;
 import com.android.server.MemoryPressureUtil;
+import com.android.server.Watchdog;
 import com.android.server.wm.WindowProcessController;
 import com.android.server.wm.WindowProcessListener;
 
@@ -680,6 +681,18 @@ class ProcessRecord implements WindowProcessListener {
     }
 
     public void makeActive(IApplicationThread _thread, ProcessStatsService tracker) {
+        String seempStr = "app_uid=" + uid
+                            + ",app_pid=" + pid + ",oom_adj=" + curAdj
+                            + ",setAdj=" + setAdj + ",hasShownUi=" + (hasShownUi ? 1 : 0)
+                            + ",cached=" + (mCached ? 1 : 0)
+                            + ",fA=" + (mHasForegroundActivities ? 1 : 0)
+                            + ",fS=" + (mHasForegroundServices ? 1 : 0)
+                            + ",systemNoUi=" + (systemNoUi ? 1 : 0)
+                            + ",curSchedGroup=" + mCurSchedGroup
+                            + ",curProcState=" + getCurProcState() + ",setProcState=" + setProcState
+                            + ",killed=" + (killed ? 1 : 0) + ",killedByAm=" + (killedByAm ? 1 : 0)
+                            + ",isDebugging=" + (isDebugging() ? 1 : 0);
+        android.util.SeempLog.record_str(386, seempStr);
         if (thread == null) {
             final ProcessState origBase = baseProcessTracker;
             if (origBase != null) {
@@ -713,6 +726,18 @@ class ProcessRecord implements WindowProcessListener {
     }
 
     public void makeInactive(ProcessStatsService tracker) {
+        String seempStr = "app_uid=" + uid
+                            + ",app_pid=" + pid + ",oom_adj=" + curAdj
+                            + ",setAdj=" + setAdj + ",hasShownUi=" + (hasShownUi ? 1 : 0)
+                            + ",cached=" + (mCached ? 1 : 0)
+                            + ",fA=" + (mHasForegroundActivities ? 1 : 0)
+                            + ",fS=" + (mHasForegroundServices ? 1 : 0)
+                            + ",systemNoUi=" + (systemNoUi ? 1 : 0)
+                            + ",curSchedGroup=" + mCurSchedGroup
+                            + ",curProcState=" + getCurProcState() + ",setProcState=" + setProcState
+                            + ",killed=" + (killed ? 1 : 0) + ",killedByAm=" + (killedByAm ? 1 : 0)
+                            + ",isDebugging=" + (isDebugging() ? 1 : 0);
+        android.util.SeempLog.record_str(387, seempStr);
         thread = null;
         mWindowProcessController.setThread(null);
         final ProcessState origBase = baseProcessTracker;
@@ -1664,28 +1689,26 @@ class ProcessRecord implements WindowProcessListener {
         StringBuilder report = new StringBuilder();
         report.append(MemoryPressureUtil.currentPsiState());
         ProcessCpuTracker processCpuTracker = new ProcessCpuTracker(true);
+        ArrayList<Integer> nativePids = null;
 
         // don't dump native PIDs for background ANRs unless it is the process of interest
-        String[] nativeProcs = null;
+        String[] nativeProc = null;
         if (isSilentAnr || onlyDumpSelf) {
             for (int i = 0; i < NATIVE_STACKS_OF_INTEREST.length; i++) {
                 if (NATIVE_STACKS_OF_INTEREST[i].equals(processName)) {
-                    nativeProcs = new String[] { processName };
+                    nativeProc = new String[] { processName };
                     break;
                 }
             }
-        } else {
-            nativeProcs = NATIVE_STACKS_OF_INTEREST;
-        }
-
-        int[] pids = nativeProcs == null ? null : Process.getPidsForCommands(nativeProcs);
-        ArrayList<Integer> nativePids = null;
-
-        if (pids != null) {
-            nativePids = new ArrayList<>(pids.length);
-            for (int i : pids) {
-                nativePids.add(i);
+            int[] pid = nativeProc == null ? null : Process.getPidsForCommands(nativeProc);
+            if(pid != null){
+                nativePids = new ArrayList<>(pid.length);
+                for (int i : pid) {
+                    nativePids.add(i);
+                }
             }
+        } else {
+            nativePids = Watchdog.getInstance().getInterestingNativePids();
         }
 
         // For background ANRs, don't pass the ProcessCpuTracker to

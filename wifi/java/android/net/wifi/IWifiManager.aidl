@@ -39,6 +39,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.SoftApConfiguration;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiDppConfig;
 import android.net.wifi.WifiNetworkSuggestion;
 
 import android.os.Messenger;
@@ -214,6 +215,34 @@ interface IWifiManager
 
     void unregisterTrafficStateCallback(int callbackIdentifier);
 
+    String getCapabilities(String capaType);
+
+    int dppAddBootstrapQrCode(String uri);
+
+    int dppBootstrapGenerate(in WifiDppConfig config);
+
+    String dppGetUri(int bootstrap_id);
+
+    int dppBootstrapRemove(int bootstrap_id);
+
+    int dppListen(String frequency, int dpp_role, boolean qr_mutual, boolean netrole_ap);
+
+    void dppStopListen();
+
+    int dppConfiguratorAdd(String curve, String key, int expiry);
+
+    int dppConfiguratorRemove(int config_id);
+
+    int  dppStartAuth(in WifiDppConfig config);
+
+    String dppConfiguratorGetKey(int id);
+
+    boolean isExtendingWifi();
+
+    boolean isWifiCoverageExtendFeatureEnabled();
+
+    void enableWifiCoverageExtendFeature(boolean enable);
+
     void registerNetworkRequestMatchCallback(in IBinder binder, in INetworkRequestMatchCallback callback, int callbackIdentifier);
 
     void unregisterNetworkRequestMatchCallback(int callbackIdentifier);
@@ -275,4 +304,10 @@ interface IWifiManager
     void setAutoWakeupEnabled(boolean enable);
 
     boolean isAutoWakeupEnabled();
+
+    int getSoftApWifiStandard();
+
+    boolean isVht8ssCapableDevice();
+
+    String doDriverCmd(String command);
 }

@@ -163,7 +163,7 @@ public final class ScanResult implements Parcelable {
      */
     @SystemApi
     public static final int KEY_MGMT_OSEN = 7;
-     /**
+    /**
      * @hide
      * Security key management scheme: SAE.
      */
@@ -216,6 +216,11 @@ public final class ScanResult implements Parcelable {
      * Security key management scheme: FILS_SHA384.
      */
     public static final int KEY_MGMT_FILS_SHA384 = 16;
+    /**
+     * @hide
+     * Security key management scheme: DPP.
+     */
+    public static final int KEY_MGMT_DPP = 17;
     /**
      * @hide
      * No cipher suite.
@@ -698,6 +703,21 @@ public final class ScanResult implements Parcelable {
      */
     public boolean is6GHz() {
         return ScanResult.is6GHz(frequency);
+    }
+
+    /**
+     * @hide
+     */
+    public boolean is60GHz() {
+        return ScanResult.is60GHz(frequency);
+    }
+
+    /**
+     * @hide
+     * TODO: makes real freq boundaries
+     */
+    public static boolean is60GHz(int freq) {
+        return freq >= 58320 && freq <= 70200;
     }
 
     /**

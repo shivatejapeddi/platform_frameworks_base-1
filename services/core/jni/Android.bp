@@ -58,8 +58,8 @@ cc_library_static {
         "com_android_server_PersistentDataBlockService.cpp",
         "com_android_server_am_CachedAppOptimizer.cpp",
         "com_android_server_am_LowMemDetector.cpp",
-		"com_android_server_activityTriggerService.cpp",
         "com_android_server_pm_PackageManagerShellCommandDataLoader.cpp",
+        "com_android_server_activityTriggerService.cpp",
         "onload.cpp",
         ":lib_networkStatsFactory_native",
     ],
@@ -167,7 +167,6 @@ cc_defaults {
         "android.system.suspend@1.0",
         "service.incremental",
         "suspend_control_aidl_interface-cpp",
-        "vendor.lineage.power@1.0",
     ],
 
     static_libs: [

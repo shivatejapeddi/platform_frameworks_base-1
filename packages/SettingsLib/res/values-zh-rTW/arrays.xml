@@ -62,6 +62,8 @@
     <item msgid="695678520785580527">"已停用"</item>
     <item msgid="6336372935919715515">"已啟用篩選結果"</item>
     <item msgid="2779123106632690576">"已啟用"</item>
+    <item>"已過濾已啟用的標題"</item>
+    <item>"已過濾已啟用的媒體包"</item>
   </string-array>
   <string-array name="bluetooth_avrcp_versions">
     <item msgid="8036025277512210160">"AVRCP 1.4 (預設)"</item>
