@@ -565,7 +565,12 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
      */
     @VisibleForTesting
     protected int getMaxShownPowerItems() {
-        return mResources.getInteger(com.android.systemui.R.integer.power_menu_max_columns);
+        int items = mResources.getInteger(com.android.systemui.R.integer.power_menu_max_columns);
+            if (mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_showEmergencyButtonInPowerMenu)) {
+            return items + 1;
+        }
+        return items;
     }
 
     /**
