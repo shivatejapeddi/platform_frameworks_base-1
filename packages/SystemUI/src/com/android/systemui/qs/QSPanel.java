@@ -661,7 +661,8 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
         }
         QSTileLayout newLayout = horizontal ? mHorizontalTileLayout : mRegularTileLayout;
         if (needsDynamicRowsAndColumns()) {
-            int rows = mQsMediaVisible ? 2 : TileLayout.NO_MAX_ROWS;
+            int rows = (mQsMediaVisible || getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) ? 2 : TileLayout.NO_MAX_ROWS;
             newLayout.setMinRows(horizontal ? 2 : rows);
             // Let's use 3 columns to match the current layout
             newLayout.setMaxColumns(horizontal ? 3 : TileLayout.NO_MAX_COLUMNS);
