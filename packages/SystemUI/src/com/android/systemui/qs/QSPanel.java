@@ -485,7 +485,7 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
                 addView(mBrightnessView, 0);
             } else {
                 removeView(mBrightnessView);
-                addView(mBrightnessView, 1);
+                addView(mBrightnessView, 2);
             }
         }
         if (QS_SHOW_AUTO_BRIGHTNESS_BUTTON.equals(key)) {
@@ -633,7 +633,7 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
 
         if (newConfig.orientation != mLastOrientation) {
             mLastOrientation = newConfig.orientation;
-            switchTileLayout(true);
+            switchTileLayout();
         }
     }
 
@@ -734,7 +734,9 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
         index++;
 
         if (!mUsingHorizontalLayout && mBrightnessView != null) {
-            switchToParent(mBrightnessView, parent, index);
+            boolean bottom = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                    QS_BRIGHTNESS_POSITION_BOTTOM, 0, UserHandle.USER_CURRENT) == 1;
+            switchToParent(mBrightnessView, parent, bottom ? index : 0);
             index++;
         }
 
