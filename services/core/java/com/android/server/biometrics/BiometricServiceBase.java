@@ -76,7 +76,7 @@ import java.util.Map;
 public abstract class BiometricServiceBase extends SystemService
         implements IHwBinder.DeathRecipient {
 
-    protected static final boolean DEBUG = true;
+    protected static final boolean DEBUG = false;
 
     private static final String KEY_LOCKOUT_RESET_USER = "lockout_reset_user";
     private static final int MSG_USER_SWITCHING = 10;

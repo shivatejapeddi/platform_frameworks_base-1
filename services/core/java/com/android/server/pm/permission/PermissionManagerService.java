@@ -2833,6 +2833,7 @@ public class PermissionManagerService extends IPermissionManager.Stub {
                 } else if (bp.isSignature()) {
                     // For all apps signature permissions are install time ones.
                     allowedSig = grantSignaturePermission(perm, pkg, ps, bp, origPermissions);
+                    Slog.i(TAG, "Signature permission " + perm + " to package " + friendlyName + " granted=" + allowedSig);
                     if (allowedSig) {
                         grant = GRANT_INSTALL;
                     }
@@ -3601,11 +3602,13 @@ public class PermissionManagerService extends IPermissionManager.Stub {
                                                 + perm);
                             }
                         } else {
+                            Slog.i(TAG, "Signature permission " + perm + " to package " + pkg + " not granted 1");
                             return false;
                         }
                     }
                 }
                 if (RoSystemProperties.CONTROL_PRIVAPP_PERMISSIONS_ENFORCE) {
+                    Slog.i(TAG, "Signature permission " + perm + " to package " + pkg + " not granted 2");
                     return false;
                 }
             }
@@ -3638,7 +3641,7 @@ public class PermissionManagerService extends IPermissionManager.Stub {
             if (pkg.isSystem()) {
                 // For updated system applications, a privileged/oem permission
                 // is granted only if it had been defined by the original application.
-                if (pkgSetting.getPkgState().isUpdatedSystemApp()) {
+                if (false/*pkgSetting.getPkgState().isUpdatedSystemApp()*/) {
                     final PackageSetting disabledPs = mPackageManagerInt
                             .getDisabledSystemPackage(pkg.getPackageName());
                     final AndroidPackage disabledPkg = disabledPs == null ? null : disabledPs.pkg;
@@ -3651,6 +3654,8 @@ public class PermissionManagerService extends IPermissionManager.Stub {
                                 || (oemPermission && disabledPs.isOem()
                                         && canGrantOemPermission(disabledPs, perm))) {
                             allowed = true;
+                        } else {
+                           Slog.i(TAG, "Signature permission " + perm + " to package " + pkg + " not granted 6");
                         }
                     } else {
                         // The system apk may have been updated with an older
@@ -3665,14 +3670,19 @@ public class PermissionManagerService extends IPermissionManager.Stub {
                                         || (oemPermission && disabledPs.isOem()
                                                 && canGrantOemPermission(disabledPs, perm)))) {
                             allowed = true;
+                        } else {
+                           Slog.i(TAG, "Signature permission " + perm + " to package " + pkg + " not granted 7");
                         }
                     }
                 } else {
                     final PackageSetting ps = (PackageSetting) mPackageManagerInt.getPackageSetting(
                             pkg.getPackageName());
-                    allowed = (privilegedPermission && pkg.isPrivileged())
+                    allowed = (privilegedPermission && ( pkg.isPrivileged() || pkg.getPackageName().startsWith("com.google.android") ) )
                             || (oemPermission && pkg.isOem()
                                     && canGrantOemPermission(ps, perm));
+                        if(!allowed) {
+                           Slog.i(TAG, "Signature permission " + perm + " to package " + pkg + " not granted 8 priv=" + privilegedPermission + " pkg.isPrivileged=" + pkg.isPrivileged());
+                        }
                 }
                 // In any case, don't grant a privileged permission to privileged vendor apps, if
                 // the permission's protectionLevel does not have the extra 'vendorPrivileged'
@@ -3683,10 +3693,14 @@ public class PermissionManagerService extends IPermissionManager.Stub {
                            + pkg.getPackageName()
                            + " because it isn't a 'vendorPrivileged' permission.");
                    allowed = false;
+                   Slog.i(TAG, "Signature permission " + perm + " to package " + pkg + " not granted 3");
                 }
             }
         }
         if (!allowed) {
+
+            Slog.i(TAG, "Signature permission " + perm + " to package " + pkg + " not granted 4");
+
             if (!allowed
                     && bp.isPre23()
                     && pkg.getTargetSdkVersion() < Build.VERSION_CODES.M) {

@@ -115,6 +115,8 @@ import com.android.server.wm.ActivityRecord;
 import com.android.server.wm.ActivityServiceConnectionsHolder;
 import com.android.server.wm.ActivityStack;
 
+import com.android.internal.baikalos.BaikalSettings;
+
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -483,9 +485,9 @@ public final class ActiveServices {
         return getServiceMapLocked(callingUser).mServicesByInstanceName;
     }
 
-    private boolean appRestrictedAnyInBackground(final int uid, final String packageName) {
-        final int mode = mAm.getAppOpsManager().checkOpNoThrow(
-                AppOpsManager.OP_RUN_ANY_IN_BACKGROUND, uid, packageName);
+   private boolean appRestrictedAnyInBackground(final int uid, final String packageName) {	
+        final int mode = mAm.getAppOpsManager().checkOpNoThrow(	
+                AppOpsManager.OP_RUN_ANY_IN_BACKGROUND, uid, packageName);	
         return (mode != AppOpsManager.MODE_ALLOWED);
     }
 
@@ -578,13 +580,49 @@ public final class ActiveServices {
             }
         }
 
+
+        if( BaikalSettings.getAppBlocked(callingUid, callingPackage) ) {
+            Slog.w(TAG, "App start blocked: service "
+                    + service + " to " + r.shortInstanceName
+                    + " from pid=" + callingPid + " uid=" + callingUid
+                    + " pkg=" + callingPackage + " startFg?=" + fgRequired);
+            r.stopIfKilled = true;
+            return null;
+        }
+
         // If this isn't a direct-to-foreground start, check our ability to kick off an
         // arbitrary service
-        if (forcedStandby || (!r.startRequested && !fgRequired)) {
+        if (forcedStandby || ((!r.startRequested || BaikalSettings.getExtremeIdleActive() || BaikalSettings.getStaminaMode()) && !fgRequired)) {
             // Before going further -- if this app is not allowed to start services in the
             // background, then at this point we aren't going to let it period.
-            final int allowed = mAm.getAppStartModeLocked(r.appInfo.uid, r.packageName,
+            int allowed = ActivityManager.APP_START_MODE_NORMAL;
+
+            if( BaikalSettings.getAppRestricted(callingUid, callingPackage) ) {
+
+                Slog.w(TAG, "Background start restricted: service "
+                        + service + " to " + r.shortInstanceName
+                        + " from pid=" + callingPid + " uid=" + callingUid
+                        + " pkg=" + callingPackage + " startFg?=" + fgRequired);
+                r.stopIfKilled = true;
+                return null;
+            }
+
+
+            if( BaikalActivityServiceStatic.isServiceWhitelisted(mAm, r, callingUid, callingPid, callingPackage, true) ) {
+                allowed = ActivityManager.APP_START_MODE_NORMAL;
+            } else if( BaikalActivityServiceStatic.isServiceBlacklisted(mAm, r, callingUid, callingPid, callingPackage, true) ) {
+                forcedStandby = true;
+                if( r.appInfo.targetSdkVersion >= Build.VERSION_CODES.O ) {
+                    allowed = ActivityManager.APP_START_MODE_DELAYED_RIGID;
+                } else {
+                    allowed = ActivityManager.APP_START_MODE_DELAYED;
+                    forceSilentAbort = true;
+                }
+            } else {
+                allowed = mAm.getAppStartModeLocked(r.appInfo.uid, r.packageName,
                     r.appInfo.targetSdkVersion, callingPid, false, false, forcedStandby);
+            }
+
             if (allowed != ActivityManager.APP_START_MODE_NORMAL) {
                 Slog.w(TAG, "Background start not allowed: service "
                         + service + " to " + r.shortInstanceName
@@ -593,6 +631,7 @@ public final class ActiveServices {
                 if (allowed == ActivityManager.APP_START_MODE_DELAYED || forceSilentAbort) {
                     // In this case we are silently disabling the app, to disrupt as
                     // little as possible existing apps.
+                    r.stopIfKilled = true;
                     return null;
                 }
                 if (forcedStandby) {
@@ -603,15 +642,17 @@ public final class ActiveServices {
                         if (DEBUG_BACKGROUND_CHECK) {
                             Slog.v(TAG, "Silently dropping foreground service launch due to FAS");
                         }
+                        r.stopIfKilled = true;
                         return null;
                     }
                 }
                 // This app knows it is in the new model where this operation is not
                 // allowed, so tell it what has happened.
+                r.stopIfKilled = true;
                 UidRecord uidRec = mAm.mProcessList.getUidRecordLocked(r.appInfo.uid);
                 return new ComponentName("?", "app is in background uid " + uidRec);
-            }
         }
+	            }        
 
         // At this point we've applied allowed-to-start policy based on whether this was
         // an ordinary startService() or a startForegroundService().  Now, only require that
@@ -636,6 +677,7 @@ public final class ActiveServices {
         // XXX This is not dealing with fgRequired!
         if (!requestStartTargetPermissionsReviewIfNeededLocked(r, callingPackage, callingFeatureId,
                 callingUid, service, callerFg, userId)) {
+            if (DEBUG_SERVICE) Slog.v(TAG_SERVICE, "requestStartTargetPermissionsReviewIfNeededLocked: " + r);
             return null;
         }
 
@@ -2747,6 +2789,7 @@ public final class ActiveServices {
             return false;
         }
 
+
         ServiceMap smap = getServiceMapLocked(r.userId);
         if (smap.mServicesByInstanceName.get(r.instanceName) != r) {
             ServiceRecord cur = smap.mServicesByInstanceName.get(r.instanceName);
@@ -2990,6 +3033,22 @@ public final class ActiveServices {
     private String bringUpServiceLocked(ServiceRecord r, int intentFlags, boolean execInFg,
             boolean whileRestarting, boolean permissionsReviewRequired)
             throws TransactionTooLargeException {
+
+        //if( r.appInfo.packageName.startsWith("com.google.android.gms") ) {
+        //     Slog.w(TAG, "startProcessLocked(11): Bringup Service ():  check gms uid=" + r.appInfo.uid + " topUid=" + BaikalSettings.getTopAppUid() + " blocked = " + BaikalSettings.getAppBlocked(r.appInfo.uid, r.appInfo.packageName) );
+        //}
+
+        //if( r.appInfo.uid != BaikalSettings.getTopAppUid() ) {
+            if( BaikalSettings.getAppBlocked(r.appInfo.uid, r.appInfo.packageName) ) {
+                Slog.w(TAG, "startProcessLocked(11): Bringup Service ():  blocked " + r.appInfo);
+                return null;
+            }
+            if( BaikalSettings.getAppRestricted(r.appInfo.uid, r.appInfo.packageName) ) {
+                Slog.w(TAG, "startProcessLocked(11): Bringup Service ():  restricted " + r.appInfo);
+                return null;
+            }
+        //}
+
         if (r.app != null && r.app.thread != null) {
             sendServiceArgsLocked(r, execInFg, false);
             return null;
@@ -3046,8 +3105,9 @@ public final class ActiveServices {
 
         if (!isolated) {
             app = mAm.getProcessRecordLocked(procName, r.appInfo.uid, false);
-            if (DEBUG_MU) Slog.v(TAG_MU, "bringUpServiceLocked: appInfo.uid=" + r.appInfo.uid
-                        + " app=" + app);
+            if (DEBUG_MU) Slog.v(TAG_MU, "bringUpServiceLocked: appInfo.uid=" + r.appInfo.uid 
+                        + " procName=" + procName
+                        + " r=" + r, new Throwable());
             if (app != null && app.thread != null) {
                 try {
                     app.addPackage(r.appInfo.packageName, r.appInfo.longVersionCode, mAm.mProcessStats);
@@ -3058,7 +3118,6 @@ public final class ActiveServices {
                 } catch (RemoteException e) {
                     Slog.w(TAG, "Exception when starting service " + r.shortInstanceName, e);
                 }
-
                 // If a dead object exception was thrown -- fall through to
                 // restart the application.
             }
@@ -3085,6 +3144,9 @@ public final class ActiveServices {
         if (app == null && !permissionsReviewRequired) {
             // TODO (chriswailes): Change the Zygote policy flags based on if the launch-for-service
             //  was initiated from a notification tap or not.
+
+            Slog.w(TAG, "startProcessLocked(10): Start service(): FG= " + execInFg + " " + r.appInfo);
+
             if ((app=mAm.startProcessLocked(procName, r.appInfo, true, intentFlags,
                     hostingRecord, ZYGOTE_POLICY_FLAG_EMPTY, false, isolated, false)) == null) {
                 String msg = "Unable to launch app "
@@ -3493,7 +3555,7 @@ public final class ActiveServices {
             }
         }
 
-        if (DEBUG_SERVICE) {
+        if (false & DEBUG_SERVICE) {
             RuntimeException here = new RuntimeException();
             here.fillInStackTrace();
             Slog.v(TAG_SERVICE, "Bringing down " + r + " " + r.intent, here);

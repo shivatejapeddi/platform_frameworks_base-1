@@ -1018,9 +1018,14 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
             }
         }
         // TODO(b/140035044)
-        return whitelistIpcs(() -> dpm != null && (dpm.getKeyguardDisabledFeatures(null, userId)
+        //return whitelistIpcs(() -> dpm != null && (dpm.getKeyguardDisabledFeatures(null, userId)
+        //        & DevicePolicyManager.KEYGUARD_DISABLE_FACE) != 0
+        //        || isSimPinSecure());
+
+        return dpm != null && (dpm.getKeyguardDisabledFeatures(null, userId)
                 & DevicePolicyManager.KEYGUARD_DISABLE_FACE) != 0
-                || isSimPinSecure());
+                || isSimPinSecure();
+
     }
 
 
@@ -2182,9 +2187,12 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
      */
     public boolean isFaceAuthEnabledForUser(int userId) {
         // TODO(b/140034352)
-        return whitelistIpcs(() -> mFaceManager != null && mFaceManager.isHardwareDetected()
+        //return whitelistIpcs(() -> mFaceManager != null && mFaceManager.isHardwareDetected()
+        //        && mFaceManager.hasEnrolledTemplates(userId)
+        //        && mFaceSettingEnabledForUser.get(userId));
+        return mFaceManager != null && mFaceManager.isHardwareDetected()
                 && mFaceManager.hasEnrolledTemplates(userId)
-                && mFaceSettingEnabledForUser.get(userId));
+                && mFaceSettingEnabledForUser.get(userId);
     }
 
     private void stopListeningForFingerprint() {

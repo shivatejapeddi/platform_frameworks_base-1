@@ -2140,6 +2140,8 @@
          states. -->
     <bool name="config_dozeAlwaysOnDisplayAvailable">false</bool>
 
+    <bool name="config_dozeAlwaysOnDisplayRequireWakelock">false</bool>
+
     <!-- Control whether the always on display mode is enabled by default. This value will be used
          during initialization when the setting is still null. -->
     <bool name="config_dozeAlwaysOnEnabled">true</bool>

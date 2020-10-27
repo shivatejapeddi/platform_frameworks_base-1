@@ -126,6 +126,11 @@ import com.android.server.wm.ActivityServiceConnectionsHolder;
 import com.android.server.wm.WindowManagerService;
 
 import dalvik.annotation.compat.VersionCodes;
+
+import com.android.internal.baikalos.AppProfile;
+import com.android.internal.baikalos.Runtime;
+import com.android.internal.baikalos.BaikalSettings;
+
 import dalvik.system.VMRuntime;
 
 import java.io.File;
@@ -161,7 +166,7 @@ public final class ProcessList {
 
     // The minimum time we allow between crashes, for us to consider this
     // application to be bad and stop and its services and reject broadcasts.
-    static final int MIN_CRASH_INTERVAL = 60 * 1000;
+    static final int MIN_CRASH_INTERVAL = 300 * 1000;
 
     // OOM adjustments for processes in various states:
 
@@ -1969,6 +1974,7 @@ public final class ProcessList {
             int uid, int[] gids, int runtimeFlags, int zygotePolicyFlags, int mountExternal,
             String seInfo, String requiredAbi, String instructionSet, String invokeWith,
             long startTime) {
+
         app.pendingStart = true;
         app.killedByAm = false;
         app.removed = false;
@@ -2434,6 +2440,35 @@ public final class ProcessList {
             app.addPackage(info.packageName, info.longVersionCode, mService.mProcessStats);
             checkSlow(startTime, "startProcess: added package to existing proc");
         }
+
+	        AppProfile profile = null;	
+        if( mService.mBaikalActivityService != null &&  mService.mBaikalActivityService.mAppSettings != null ) {	
+            profile = mService.mBaikalActivityService.mAppSettings.getProfile(app.uid,info.packageName);	
+        }
+        
+        if ((info.flags & PERSISTENT_MASK) == PERSISTENT_MASK) {
+            app.setPersistent(true);
+            app.maxAdj = ProcessList.PERSISTENT_PROC_ADJ;
+        }
+
+        if ((info.flags & PERSISTENT_MASK) == PERSISTENT_MASK) {
+            if( BaikalSettings.getAppRestricted(app.uid,info.packageName) ) {
+                Slog.d(TAG, "baikal: setPersistent6("+ info.packageName + ") - app is restricted. strip PERSISTENT flag");
+            } else if( profile != null && profile.mBackground > 0 ) {
+                Slog.d(TAG, "baikal: setPersistent5("+ info.packageName + ") - app is restricted. strip PERSISTENT flag");
+            } else if( !info.packageName.equals("com.motorola.faceunlock") &&
+                !info.packageName.equals("com.asus.stitchimage") ) {
+                app.setPersistent(true);
+                app.maxAdj = ProcessList.PERSISTENT_PROC_ADJ;
+            }
+        }
+		
+        if( profile != null && profile.mPinned ) {
+		
+            app.maxAdj = ProcessList.PERSISTENT_PROC_ADJ;	
+            Slog.d(TAG, "baikal: setPersistent4("+ info.packageName + ")");	
+        }        
+
 
         // If the system is not ready yet, then hold off on starting this
         // process until it is.

@@ -178,5 +178,9 @@
 
     <!-- Enable face auth only when swiping security view -->
     <bool name="config_faceAuthOnlyOnSecurityView">false</bool>
-
+    
+    <integer name="config_buttonBrightnessSettingMinimum">0</integer>
+    <integer name="config_buttonBrightnessSettingMaximum">255</integer>
+    <integer name="config_buttonBrightnessSettingDefault">128</integer>
+    
 </resources>

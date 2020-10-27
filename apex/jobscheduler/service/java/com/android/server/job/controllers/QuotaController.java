@@ -647,6 +647,7 @@ public final class QuotaController extends StateController {
         //   2. the app is currently in the foreground
         //   3. the app overall is within its quota
         return isTopStartedJobLocked(jobStatus)
+                || jobStatus.dozeWhitelisted        
                 || isUidInForeground(jobStatus.getSourceUid())
                 || isWithinQuotaLocked(
                 jobStatus.getSourceUserId(), jobStatus.getSourcePackageName(), standbyBucket);

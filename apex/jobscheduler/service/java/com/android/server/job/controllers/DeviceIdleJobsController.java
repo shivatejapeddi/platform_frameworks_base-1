@@ -213,7 +213,8 @@ public final class DeviceIdleJobsController extends StateController {
 
     @Override
     public void maybeStartTrackingJobLocked(JobStatus jobStatus, JobStatus lastJob) {
-        if ((jobStatus.getFlags()&JobInfo.FLAG_IMPORTANT_WHILE_FOREGROUND) != 0) {
+        if ((jobStatus.getFlags()&JobInfo.FLAG_IMPORTANT_WHILE_FOREGROUND) != 0 || 
+            isWhitelistedLocked(jobStatus) ) {
             mAllowInIdleJobs.add(jobStatus);
         }
         updateTaskStateLocked(jobStatus);
@@ -222,9 +223,11 @@ public final class DeviceIdleJobsController extends StateController {
     @Override
     public void maybeStopTrackingJobLocked(JobStatus jobStatus, JobStatus incomingJob,
             boolean forUpdate) {
-        if ((jobStatus.getFlags()&JobInfo.FLAG_IMPORTANT_WHILE_FOREGROUND) != 0) {
+        if ((jobStatus.getFlags()&JobInfo.FLAG_IMPORTANT_WHILE_FOREGROUND) != 0 || 
+            isWhitelistedLocked(jobStatus) ) {
             mAllowInIdleJobs.remove(jobStatus);
         }
+         updateTaskStateLocked(jobStatus);       
     }
 
     @Override

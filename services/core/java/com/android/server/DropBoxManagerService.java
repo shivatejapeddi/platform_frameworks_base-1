@@ -257,11 +257,13 @@ public final class DropBoxManagerService extends SystemService {
         }
 
         private void prepareAndSendBroadcast(Intent intent) {
+	    /*
             if (!DropBoxManagerService.this.mBooted) {
                 intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
             }
             getContext().sendBroadcastAsUser(intent, UserHandle.ALL,
                     android.Manifest.permission.READ_LOGS);
+	    */
         }
 
         private Intent createIntent(String tag, long time) {

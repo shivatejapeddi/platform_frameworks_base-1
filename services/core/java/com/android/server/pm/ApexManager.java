@@ -535,7 +535,8 @@ public abstract class ApexManager {
                         Slog.w(TAG, "Scan apex failed, not a coreApp:" + ai.modulePath);
                         continue;
                     }
-                    throw new IllegalStateException("Unable to parse: " + ai.modulePath, throwable);
+                    // throw new IllegalStateException("Unable to parse: " + ai.modulePath, throwable);
+                    Slog.e(TAG, "Unable to parse: " + ai.modulePath, throwable);
                 } else {
                     throw new IllegalStateException("Unexpected exception occurred while parsing "
                             + ai.modulePath, throwable);

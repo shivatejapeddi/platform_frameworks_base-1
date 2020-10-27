@@ -172,9 +172,9 @@ public class AppStandbyController implements AppStandbyInternal {
      */
     private static final long[] ELAPSED_TIME_THRESHOLDS = {
             0,
-            COMPRESS_TIME ?  1 * ONE_MINUTE : 12 * ONE_HOUR,
-            COMPRESS_TIME ?  4 * ONE_MINUTE : 24 * ONE_HOUR,
-            COMPRESS_TIME ? 16 * ONE_MINUTE : 48 * ONE_HOUR,
+            COMPRESS_TIME ?  1 * ONE_MINUTE : 4 * ONE_HOUR,
+            COMPRESS_TIME ?  4 * ONE_MINUTE : 8 * ONE_HOUR,
+            COMPRESS_TIME ? 16 * ONE_MINUTE : 12 * ONE_HOUR,
             COMPRESS_TIME ? 32 * ONE_MINUTE : 30 * ONE_DAY
     };
 
@@ -198,7 +198,7 @@ public class AppStandbyController implements AppStandbyInternal {
     };
 
     /** Default expiration time for bucket prediction. After this, use thresholds to downgrade. */
-    private static final long DEFAULT_PREDICTION_TIMEOUT = 12 * ONE_HOUR;
+    private static final long DEFAULT_PREDICTION_TIMEOUT = 4 * ONE_HOUR;
 
     /**
      * Indicates the maximum wait time for admin data to be available;
@@ -2277,15 +2277,15 @@ public class AppStandbyController implements AppStandbyInternal {
                 "auto_restricted_bucket_delay_ms";
         private static final String KEY_CROSS_PROFILE_APPS_SHARE_STANDBY_BUCKETS =
                 "cross_profile_apps_share_standby_buckets";
-        public static final long DEFAULT_STRONG_USAGE_TIMEOUT = 1 * ONE_HOUR;
-        public static final long DEFAULT_NOTIFICATION_TIMEOUT = 12 * ONE_HOUR;
-        public static final long DEFAULT_SYSTEM_UPDATE_TIMEOUT = 2 * ONE_HOUR;
-        public static final long DEFAULT_SYSTEM_INTERACTION_TIMEOUT = 10 * ONE_MINUTE;
-        public static final long DEFAULT_SYNC_ADAPTER_TIMEOUT = 10 * ONE_MINUTE;
+        public static final long DEFAULT_STRONG_USAGE_TIMEOUT = 10 * ONE_MINUTE;
+        public static final long DEFAULT_NOTIFICATION_TIMEOUT = 15 * ONE_MINUTE;
+        public static final long DEFAULT_SYSTEM_UPDATE_TIMEOUT = 2 * ONE_MINUTE;
+        public static final long DEFAULT_SYSTEM_INTERACTION_TIMEOUT = 5 * ONE_MINUTE;
+        public static final long DEFAULT_SYNC_ADAPTER_TIMEOUT = 5 * ONE_MINUTE;
         public static final long DEFAULT_EXEMPTED_SYNC_SCHEDULED_NON_DOZE_TIMEOUT = 10 * ONE_MINUTE;
-        public static final long DEFAULT_EXEMPTED_SYNC_SCHEDULED_DOZE_TIMEOUT = 4 * ONE_HOUR;
-        public static final long DEFAULT_EXEMPTED_SYNC_START_TIMEOUT = 10 * ONE_MINUTE;
-        public static final long DEFAULT_UNEXEMPTED_SYNC_SCHEDULED_TIMEOUT = 10 * ONE_MINUTE;
+        public static final long DEFAULT_EXEMPTED_SYNC_SCHEDULED_DOZE_TIMEOUT = 10 * ONE_MINUTE;
+        public static final long DEFAULT_EXEMPTED_SYNC_START_TIMEOUT = 5 * ONE_MINUTE;
+        public static final long DEFAULT_UNEXEMPTED_SYNC_SCHEDULED_TIMEOUT = 5 * ONE_MINUTE;
         public static final long DEFAULT_INITIAL_FOREGROUND_SERVICE_START_TIMEOUT = 30 * ONE_MINUTE;
         public static final long DEFAULT_AUTO_RESTRICTED_BUCKET_DELAY_MS = ONE_DAY;
         public static final boolean DEFAULT_CROSS_PROFILE_APPS_SHARE_STANDBY_BUCKETS = true;
@@ -2341,7 +2341,7 @@ public class AppStandbyController implements AppStandbyInternal {
                 mAppStandbyElapsedThresholds = parseLongArray(elapsedThresholdsValue,
                         ELAPSED_TIME_THRESHOLDS, MINIMUM_ELAPSED_TIME_THRESHOLDS);
                 mCheckIdleIntervalMillis = Math.min(mAppStandbyElapsedThresholds[1] / 4,
-                        COMPRESS_TIME ? ONE_MINUTE : 4 * 60 * ONE_MINUTE); // 4 hours
+                        COMPRESS_TIME ? ONE_MINUTE : 60 * ONE_MINUTE); // 4 hours
                 mStrongUsageTimeoutMillis = mParser.getDurationMillis(
                         KEY_STRONG_USAGE_HOLD_DURATION,
                                 COMPRESS_TIME ? ONE_MINUTE : DEFAULT_STRONG_USAGE_TIMEOUT);

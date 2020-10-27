@@ -70,6 +70,7 @@ import android.os.UserHandle;
 import android.os.UserManager;
 import android.os.WorkSource;
 import android.text.TextUtils;
+import android.provider.Settings;
 import android.util.ArrayMap;
 import android.util.DisplayMetrics;
 import android.util.Singleton;
@@ -142,6 +143,7 @@ public class ActivityManager {
 
     @UnsupportedAppUsage
     private final Context mContext;
+    private static Context mStaticContext;
 
     private static volatile boolean sSystemReady = false;
 
@@ -788,6 +790,7 @@ public class ActivityManager {
     @UnsupportedAppUsage
     /*package*/ ActivityManager(Context context, Handler handler) {
         mContext = context;
+        mStaticContext = context;
     }
 
     /**
@@ -979,6 +982,11 @@ public class ActivityManager {
      * @hide
      */
     public static boolean isSmallBatteryDevice() {
+	try {
+	    return Settings.Global.getInt(mStaticContext.getContentResolver(),
+                Settings.Global.BAIKALOS_EXTREME_IDLE, 0) == 1;
+	} catch(Exception e) {
+	}
         return RoSystemProperties.CONFIG_SMALL_BATTERY;
     }
 

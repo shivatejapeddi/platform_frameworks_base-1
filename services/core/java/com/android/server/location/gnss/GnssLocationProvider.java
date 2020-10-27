@@ -92,6 +92,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.android.internal.baikalos.BaikalSettings;
+
 /**
  * A GNSS implementation of LocationProvider used by LocationManager.
  *
@@ -582,6 +584,13 @@ public class GnssLocationProvider extends AbstractLocationProvider implements
     private void updateLowPowerMode() {
         // Disable GPS if we are in device idle mode and the device is stationary.
         boolean disableGpsForPowerManager = mPowerManager.isDeviceIdleMode() && mIsDeviceStationary;
+        if( BaikalSettings.getAggressiveIdleEnabled() ) {
+            disableGpsForPowerManager = mPowerManager.isDeviceIdleMode();
+        }
+
+        if( BaikalSettings.getStaminaMode() ) {
+            disableGpsForPowerManager = true;
+        }        
         final PowerSaveState result = mPowerManager.getPowerSaveState(ServiceType.LOCATION);
         switch (result.locationMode) {
             case PowerManager.LOCATION_MODE_GPS_DISABLED_WHEN_SCREEN_OFF:

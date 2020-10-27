@@ -621,12 +621,6 @@ public final class AudioAttributes implements Parcelable {
      */
     @CapturePolicy
     public int getAllowedCapturePolicy() {
-        if ((mFlags & FLAG_NO_SYSTEM_CAPTURE) == FLAG_NO_SYSTEM_CAPTURE) {
-            return ALLOW_CAPTURE_BY_NONE;
-        }
-        if ((mFlags & FLAG_NO_MEDIA_PROJECTION) == FLAG_NO_MEDIA_PROJECTION) {
-            return ALLOW_CAPTURE_BY_SYSTEM;
-        }
         return ALLOW_CAPTURE_BY_ALL;
     }
 

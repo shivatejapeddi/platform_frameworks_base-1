@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 class ThemeOverlayManager {
     private static final String TAG = "ThemeOverlayManager";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     @VisibleForTesting
     static final String ANDROID_PACKAGE = "android";

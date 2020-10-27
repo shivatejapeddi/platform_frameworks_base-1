@@ -769,7 +769,7 @@ public final class JobStatus {
      * exemptions.
      */
     public int getEffectiveStandbyBucket() {
-        if (uidActive || getJob().isExemptedFromAppStandby()) {
+        if (uidActive || dozeWhitelisted || getJob().isExemptedFromAppStandby()) {
             // Treat these cases as if they're in the ACTIVE bucket so that they get throttled
             // like other ACTIVE apps.
             return ACTIVE_INDEX;

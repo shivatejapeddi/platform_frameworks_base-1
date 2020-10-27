@@ -89,6 +89,7 @@ import com.android.internal.util.EmergencyAffordanceManager;
 import com.android.internal.util.FrameworkStatsLog;
 import com.android.internal.widget.ILockSettings;
 import com.android.server.am.ActivityManagerService;
+import com.android.server.BaikalSystemService;
 import com.android.server.appbinding.AppBindingService;
 import com.android.server.attention.AttentionManagerService;
 import com.android.server.audio.AudioService;
@@ -1249,6 +1250,10 @@ public final class SystemServer {
 
             t.traceBegin("SignedConfigService");
             SignedConfigService.registerUpdateReceiver(mSystemContext);
+            t.traceEnd();
+
+            t.traceBegin("BaikalSystemService");
+            mSystemServiceManager.startService(BaikalSystemService.class);
             t.traceEnd();
 
             t.traceBegin("AppIntegrityService");

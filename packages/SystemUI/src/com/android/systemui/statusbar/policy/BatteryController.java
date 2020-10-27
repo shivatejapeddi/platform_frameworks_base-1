@@ -38,6 +38,11 @@ public interface BatteryController extends DemoMode, Dumpable,
     void setPowerSaveMode(boolean powerSave);
 
     /**
+     * Sets if the current device is in power save mode.
+     */
+    void setStaminaMode(boolean powerSave);
+
+    /**
      * Returns {@code true} if the device is currently plugged in.
      */
     boolean isPluggedIn();
@@ -86,6 +91,13 @@ public interface BatteryController extends DemoMode, Dumpable,
     }
 
     /**
+     * Returns {@code true} if extreme battery saver is on.
+     */
+    default boolean isStaminaOn() {
+        return false;
+    }
+
+    /**
      * A listener that will be notified whenever a change in battery level or power save mode has
      * occurred.
      */
@@ -95,6 +107,9 @@ public interface BatteryController extends DemoMode, Dumpable,
         }
 
         default void onPowerSaveChanged(boolean isPowerSave) {
+        }
+
+        default void onStaminaChanged(boolean isStamina) {
         }
 
         default void onReverseChanged(boolean isReverse, int level, String name) {

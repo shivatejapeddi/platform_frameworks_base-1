@@ -4563,16 +4563,32 @@ public class AudioManager {
     @UnsupportedAppUsage
     public int getDevicesForStream(int streamType) {
         switch (streamType) {
+        case STREAM_MUSIC:
+            {
+            /*return*/int devices = AudioSystem.getDevicesForStream(streamType);
+            Log.d(TAG, "getDevicesForStream stream: " + streamType + ", devices=" + devices);
+            return devices;
+            }
         case STREAM_VOICE_CALL:
         case STREAM_SYSTEM:
         case STREAM_RING:
-        case STREAM_MUSIC:
         case STREAM_ALARM:
         case STREAM_NOTIFICATION:
         case STREAM_DTMF:
         case STREAM_ACCESSIBILITY:
-            return AudioSystem.getDevicesForStream(streamType);
+            {
+            /*return*/int devices = AudioSystem.getDevicesForStream(streamType);
+            if( (devices & 
+                (AudioSystem.DEVICE_OUT_BLUETOOTH_A2DP | DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES | DEVICE_OUT_BLUETOOTH_A2DP_SPEAKER)
+                ) != 0 ) {
+                Log.d(TAG, "getDevicesForStream A2DP connected: " + streamType + ", devices=" + devices);
+                devices |= AudioSystem.DEVICE_OUT_SPEAKER;
+            }
+            Log.d(TAG, "getDevicesForStream stream: " + streamType + ", devices=" + devices);
+            return devices;
+            }
         default:
+            Log.d(TAG, "getDevicesForStream invalid stream: " + streamType + ", devices=0");
             return 0;
         }
     }

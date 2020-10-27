@@ -1215,7 +1215,7 @@ public class AppStateTracker {
      */
     public boolean isUidPowerSaveUserWhitelisted(int uid) {
         synchronized (mLock) {
-            return ArrayUtils.contains(mPowerWhitelistedUserAppIds, UserHandle.getAppId(uid));
+            return ArrayUtils.contains(mPowerWhitelistedAllAppIds, UserHandle.getAppId(uid));
         }
     }
 

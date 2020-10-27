@@ -469,7 +469,7 @@ class AutomaticBrightnessController {
         if (enable) {
             if (!mLightSensorEnabled) {
                 mLightSensorEnabled = true;
-                mLightSensorEnableTime = SystemClock.uptimeMillis();
+                mLightSensorEnableTime = SystemClock.elapsedRealtime();
                 mCurrentLightSensorRate = mInitialLightSensorRate;
                 registerForegroundAppUpdater();
                 mSensorManager.registerListener(mLightSensorListener, mLightSensor,
@@ -643,7 +643,7 @@ class AutomaticBrightnessController {
     }
 
     private void updateAmbientLux() {
-        long time = SystemClock.uptimeMillis();
+        long time = SystemClock.elapsedRealtime();
         mAmbientLightRingBuffer.prune(time - mAmbientLightHorizon);
         updateAmbientLux(time);
     }
@@ -921,7 +921,7 @@ class AutomaticBrightnessController {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (mLightSensorEnabled) {
-                final long time = SystemClock.uptimeMillis();
+                final long time = SystemClock.elapsedRealtime();
                 final float lux = event.values[0];
                 handleLightSensorEvent(time, lux);
             }
@@ -1058,7 +1058,7 @@ class AutomaticBrightnessController {
             StringBuffer buf = new StringBuffer();
             buf.append('[');
             for (int i = 0; i < mCount; i++) {
-                final long next = i + 1 < mCount ? getTime(i + 1) : SystemClock.uptimeMillis();
+                final long next = i + 1 < mCount ? getTime(i + 1) : SystemClock.elapsedRealtime();
                 if (i != 0) {
                     buf.append(", ");
                 }

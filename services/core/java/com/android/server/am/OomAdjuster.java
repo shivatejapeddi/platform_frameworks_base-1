@@ -855,6 +855,7 @@ public final class OomAdjuster {
             final long oldTime, final ActiveUids activeUids) {
         ArrayList<ProcessRecord> lruList = mProcessList.mLruProcesses;
         final int numLru = lruList.size();
+        final ProcessRecord TOP_APP = mService.getTopAppLocked();
 
         final int emptyProcessLimit = mConstants.CUR_MAX_EMPTY_PROCESSES;
         final int cachedProcessLimit = mConstants.CUR_MAX_CACHED_PROCESSES
@@ -905,6 +906,19 @@ public final class OomAdjuster {
                     applyOomAdjLocked(app, true, now, nowElapsed);
                 }
 
+                int baikalAdj = 0;
+                if( app.isPersistent() ) {
+                    baikalAdj = 0;
+                } else {
+                    baikalAdj = BaikalActivityServiceStatic.applyOomAdjLocked(mService,app,TOP_APP);
+                    if( baikalAdj == 2 ) {
+                        app.kill("by baikalos service",ApplicationExitInfo.REASON_OTHER,
+                           ApplicationExitInfo.SUBREASON_ISOLATED_NOT_NEEDED, true);
+                        continue;
+                    } 
+                }
+
+                if( baikalAdj == 0 ) {
                 // Count the number of process types.
                 switch (app.getCurProcState()) {
                     case PROCESS_STATE_CACHED_ACTIVITY:
@@ -955,6 +969,7 @@ public final class OomAdjuster {
                         mNumNonCachedProcs++;
                         break;
                 }
+                }
 
                 if (app.isolated && app.numberOfRunningServices() <= 0
                         && app.isolatedEntryPoint == null) {
@@ -965,7 +980,7 @@ public final class OomAdjuster {
                     // definition not re-use the same process again, and it is
                     // good to avoid having whatever code was running in them
                     // left sitting around after no longer needed.
-                    app.kill("isolated not needed", ApplicationExitInfo.REASON_OTHER,
+                    if( baikalAdj == 0 ) app.kill("isolated not needed", ApplicationExitInfo.REASON_OTHER,
                             ApplicationExitInfo.SUBREASON_ISOLATED_NOT_NEEDED, true);
                 } else {
                     // Keeping this process, update its uid.
@@ -2011,6 +2026,9 @@ public final class OomAdjuster {
                         clientProcState = PROCESS_STATE_BOUND_TOP;
                     } else {
                         clientProcState = PROCESS_STATE_BOUND_FOREGROUND_SERVICE;
+                        adj = clientAdj > ProcessList.FOREGROUND_APP_ADJ
+                                ? clientAdj : ProcessList.FOREGROUND_APP_ADJ;
+                        app.setCurRawAdj(adj);
                     }
                 }
 
@@ -2042,7 +2060,7 @@ public final class OomAdjuster {
             // FOREGROUND_APP_ADJ.
             if (cpr.hasExternalProcessHandles()) {
                 if (adj > ProcessList.FOREGROUND_APP_ADJ) {
-                    adj = ProcessList.FOREGROUND_APP_ADJ;
+                    adj = ProcessList.FOREGROUND_APP_ADJ+50;
                     app.setCurRawAdj(adj);
                     schedGroup = ProcessList.SCHED_GROUP_DEFAULT;
                     app.setCached(false);

@@ -87,6 +87,8 @@ public class PowerWhitelistBackend {
      * Check if it is default active app in multiple area(i.e. SMS, Dialer, Device admin..)
      */
     public boolean isDefaultActiveApp(String pkg) {
+
+        if( pkg.startsWith("com.google.android.gms") ) return false;
         // Additionally, check if pkg is default dialer/sms. They are considered essential apps and
         // should be automatically whitelisted (otherwise user may be able to set restriction on
         // them, leading to bad device behavior.)

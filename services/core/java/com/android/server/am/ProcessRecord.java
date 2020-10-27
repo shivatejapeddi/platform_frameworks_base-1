@@ -264,7 +264,7 @@ class ProcessRecord implements WindowProcessListener {
     // Controller for driving the process state on the window manager side.
     private final WindowProcessController mWindowProcessController;
     // all ServiceRecord running in this process
-    private final ArraySet<ServiceRecord> mServices = new ArraySet<>();
+    final ArraySet<ServiceRecord> mServices = new ArraySet<>();
     // services that are currently executing code (need to remain foreground).
     final ArraySet<ServiceRecord> executingServices = new ArraySet<>();
     // All ConnectionRecord this process holds

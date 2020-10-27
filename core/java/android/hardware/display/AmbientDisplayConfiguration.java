@@ -232,8 +232,17 @@ public class AmbientDisplayConfiguration {
         return boolSettingDefaultOff(Settings.Secure.SUPPRESS_DOZE, user);
     }
 
+    /** {@hide} */
+    public boolean alwaysOnRequireWakelock() {
+        return alwaysOnDisplayRequireWakelock();
+    }
+
     private boolean alwaysOnDisplayAvailable() {
         return mContext.getResources().getBoolean(R.bool.config_dozeAlwaysOnDisplayAvailable);
+    }
+
+    private boolean alwaysOnDisplayRequireWakelock() {
+        return mContext.getResources().getBoolean(R.bool.config_dozeAlwaysOnDisplayRequireWakelock);
     }
 
     private boolean alwaysOnDisplayDebuggingEnabled() {

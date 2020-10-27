@@ -524,7 +524,11 @@ public class SettingsInjector {
 
             // Start the service, making sure that this is attributed to the user associated with
             // the setting rather than the system user.
-            mContext.startServiceAsUser(intent, setting.mUserHandle);
+            try {
+                mContext.startServiceAsUser(intent, setting.mUserHandle);
+            } catch(Exception e) {
+                Log.d(TAG, setting + ": can't start intent: " + intent);
+            }
         }
 
         public long getElapsedTime() {
