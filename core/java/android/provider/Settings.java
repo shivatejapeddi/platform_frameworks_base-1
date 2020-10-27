@@ -4805,6 +4805,12 @@ public final class Settings {
         public static final String MULTI_AUDIO_FOCUS_ENABLED = "multi_audio_focus_enabled";
 
         /**
+         * Current UI mode
+         * @hide
+         */
+        public static final String SYSTEM_THEME_STYLE = "system_theme_style";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
@@ -5400,6 +5406,13 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_BAR_ARROW_KEYS = "navigation_bar_menu_arrow_keys";
+
+        /**
+         * Settings dashboard icon style
+         * @hide
+         */
+        public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
+                "theming_settings_dashboard_icons";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
