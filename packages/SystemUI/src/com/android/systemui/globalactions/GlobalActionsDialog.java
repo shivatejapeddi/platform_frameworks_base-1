@@ -566,8 +566,8 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     @VisibleForTesting
     protected int getMaxShownPowerItems() {
         int items = mResources.getInteger(com.android.systemui.R.integer.power_menu_max_columns);
-            if (mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_showEmergencyButtonInPowerMenu)) {
+            if (Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.POWERMENU_EMERGENCY, 0) == 1) {
             return items + 1;
         }
         return items;
@@ -619,8 +619,9 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
         CurrentUserProvider currentUser = new CurrentUserProvider();
 
         // make sure emergency affordance action is first, if needed
-        if (mEmergencyAffordanceManager.needsEmergencyAffordance() && mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_showEmergencyButtonInPowerMenu)) {
+        if (mEmergencyAffordanceManager.needsEmergencyAffordance() &&
+                Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.POWERMENU_EMERGENCY, 0) == 1) {
             addIfShouldShowAction(tempActions, new EmergencyAffordanceAction());
             addedKeys.add(GLOBAL_ACTION_KEY_EMERGENCY);
         }
@@ -700,8 +701,13 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
                     addIfShouldShowAction(tempActions, new LogoutAction());
                 }
             } else if (GLOBAL_ACTION_KEY_EMERGENCY.equals(actionKey)) {
+<<<<<<< HEAD
                 if (mContext.getResources().getBoolean(
                     com.android.internal.R.bool.config_showEmergencyButtonInPowerMenu)) {
+=======
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_EMERGENCY, 0) == 1) {
+>>>>>>> 5a7abbfd90053ee6133e841a3d415ddaf8e9932a
                     addIfShouldShowAction(tempActions, new EmergencyDialerAction());
                 }
             } else {
