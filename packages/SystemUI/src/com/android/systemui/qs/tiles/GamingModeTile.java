@@ -118,7 +118,7 @@ public class GamingModeTile extends QSTileImpl<BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.SYBERIA;
+        return MetricsEvent.EXTENSIONS;
     }
 
     @Override

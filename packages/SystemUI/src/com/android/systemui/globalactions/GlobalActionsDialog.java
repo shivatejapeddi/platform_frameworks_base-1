@@ -701,13 +701,8 @@ public class GlobalActionsDialog implements DialogInterface.OnDismissListener,
                     addIfShouldShowAction(tempActions, new LogoutAction());
                 }
             } else if (GLOBAL_ACTION_KEY_EMERGENCY.equals(actionKey)) {
-<<<<<<< HEAD
-                if (mContext.getResources().getBoolean(
-                    com.android.internal.R.bool.config_showEmergencyButtonInPowerMenu)) {
-=======
                 if (Settings.System.getInt(mContext.getContentResolver(),
                         Settings.System.POWERMENU_EMERGENCY, 0) == 1) {
->>>>>>> 5a7abbfd90053ee6133e841a3d415ddaf8e9932a
                     addIfShouldShowAction(tempActions, new EmergencyDialerAction());
                 }
             } else {

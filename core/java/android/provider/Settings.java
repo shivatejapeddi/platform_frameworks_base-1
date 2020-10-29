@@ -5420,9 +5420,6 @@ public final class Settings {
          */
         public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
                 "theming_settings_dashboard_icons";
-<<<<<<< HEAD
-                
-=======
 
         /**
          * Volume panel on left
@@ -5430,7 +5427,6 @@ public final class Settings {
          */
         public static final String VOLUME_PANEL_ON_LEFT = "volume_panel_on_left";
 
->>>>>>> 5a7abbfd90053ee6133e841a3d415ddaf8e9932a
         /**
          * Gaming mode master switch
          * @hide
@@ -5616,10 +5612,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(DOUBLE_TAP_SLEEP_LOCKSCREEN);
             PRIVATE_SETTINGS.add(DOUBLE_TAP_SLEEP_GESTURE);
             PRIVATE_SETTINGS.add(NETWORK_TRAFFIC_VIEW_LOCATION);
-<<<<<<< HEAD
-=======
             PRIVATE_SETTINGS.add(VOLUME_PANEL_ON_LEFT);
->>>>>>> 5a7abbfd90053ee6133e841a3d415ddaf8e9932a
         }
 
 

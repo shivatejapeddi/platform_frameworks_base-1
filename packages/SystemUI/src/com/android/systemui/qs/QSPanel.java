@@ -1422,11 +1422,4 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
         mBrightnessController.setBrightnessFromSliderButtons(min ? 0 : GAMMA_SPACE_MAX);
     }
 
-    public int getNumColumns() {
-        return mTileLayout.getNumColumns();
-    }
-
-    private void setBrightnessMinMax(boolean min) {
-        mBrightnessController.setBrightnessFromSliderButtons(min ? 0 : GAMMA_SPACE_MAX);
-    }
 }
