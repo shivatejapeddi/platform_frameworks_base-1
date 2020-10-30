@@ -166,10 +166,6 @@ public class QSFactoryImpl implements QSFactory {
         mFPSInfoTileProvider = fpsInfoTileProvider;
     }
 
-    public void setHost(QSTileHost host) {
-        mHost = host;
-    }
-
     public QSTile createTile(String tileSpec) {
         QSTileImpl tile = createTileInternal(tileSpec);
         if (tile != null) {
