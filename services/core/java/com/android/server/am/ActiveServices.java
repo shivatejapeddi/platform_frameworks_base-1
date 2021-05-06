@@ -590,6 +590,16 @@ public final class ActiveServices {
             return null;
         }
 
+        if( mAm.getAppStartModeLocked(r.appInfo.uid, r.packageName,
+                    r.appInfo.targetSdkVersion, callingPid, false, true, true) == ActivityManager.APP_START_MODE_DISABLED ) {
+            Slog.w(TAG, "Background start disabled: service "
+                    + service + " to " + r.shortInstanceName
+                    + " from pid=" + callingPid + " uid=" + callingUid
+                    + " pkg=" + callingPackage);
+                r.stopIfKilled = true;
+                return null;
+        }
+        
         // If this isn't a direct-to-foreground start, check our ability to kick off an
         // arbitrary service
         if (forcedStandby || ((!r.startRequested || BaikalSettings.getExtremeIdleActive() || BaikalSettings.getStaminaMode()) && !fgRequired)) {
