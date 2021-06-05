@@ -3201,6 +3201,13 @@ public final class PowerManagerService extends SystemService
                         + ", sQuiescent=" + sQuiescent
                         + ", dirty=" + Integer.toHexString(dirty));
             }
+
+        if( oldDisplayPolicy != mDisplayPowerRequest.policy ) {
+        boolean mode = (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_BRIGHT) | 
+                   (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_DIM) | 
+                   (mDisplayPowerRequest.policy == DisplayPowerRequest.POLICY_VR);
+        Actions.sendScreenModeChanged(mode);
+        }
         }
         return mDisplayReady && !oldDisplayReady;
     }
