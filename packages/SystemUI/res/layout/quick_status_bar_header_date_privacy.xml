@@ -43,9 +43,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
             android:gravity="center_vertical"
-            android:singleLine="true"
+            android:singleLine="false"
             android:textAppearance="@style/TextAppearance.QS.Status"
-            systemui:datePattern="@string/abbrev_wday_month_day_no_year_alarm" />
+            systemui:datePattern="@string/abbrev_wday_month_day_year" />
     </FrameLayout>
 
     <android.widget.Space
